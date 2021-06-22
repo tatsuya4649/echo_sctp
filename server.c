@@ -52,5 +52,19 @@ int main(int argc,char *argv[])
 
 	for (;;)
 	{
+		len = sizeof(struct sockaddr_in);
+		rd_sz = sctp_recvmsg(sockfd,readbuf,sizeof(readbuf),(struct sockaddr *) &cliaddr,&len,&sri,&msg_flags);
+		if (rd_sz == -1){
+			perror("sctp_recvmsg");
+			continue;
+		}
+		if (stream_increment){
+			sri.sinfo_stream++;
+		}
+
+		if (sctp_sendmsg(sockfd,readbuf,rd_sz,(struct sockaddr *) &cliaddr,len,sri.sinfo_ppid,sri.sinfo_flags,sri.sinfo_stream,0,0) == -1){
+			perror("sctp_sendmsg");
+			continue;
+		}
 	}
 }
