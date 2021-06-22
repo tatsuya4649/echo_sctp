@@ -1,0 +1,4 @@
+
+#define BUFFSIZE	2000
+#define SERV_PORT	12000
+
