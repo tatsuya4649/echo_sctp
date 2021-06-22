@@ -1,4 +1,5 @@
 
 #define BUFFSIZE	2000
 #define SERV_PORT	12000
+#define MAXLINE		1000
 

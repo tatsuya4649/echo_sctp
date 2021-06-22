@@ -9,6 +9,34 @@
 #include <arpa/inet.h>
 #include "echo.h"
 
+void sctpstr_cli(FILE *fp,int sockfd,struct sockaddr *to,socklen_t tolen)
+{
+	struct sockaddr_in peeraddr;
+	struct sctp_sndrcvinfo sri;
+	char sendline[MAXLINE],recvline[MAXLINE];
+	socklen_t len;
+	int out_sz,rd_sz;
+	int msg_flags;
+
+	memset(&sri,0,sizeof(sri));
+	while(fgets(sendline,MAXLINE,fp) != NULL){
+		if (sendline[0] != '['){
+			fprintf(stderr,"Error, line must be of the form '[streamnum] text'\n");
+			continue;
+		}
+		sri.sinfo_stream = strtol(&sendline[1],NULL,0);
+		out_sz = strlen(sendline);
+		if (sctp_sendmsg(sockfd,sendline,out_sz,to,tolen,0,0,sri.sinfo_stream,0,0) == -1){
+			perror("sctp_sendmsg");
+			continue;
+		}
+		len = sizeof(peeraddr);
+		rd_sz = sctp_recvmsg(sockfd,recvline,sizeof(recvline),(struct sockaddr *) &peeraddr,&len,&sri,&msg_flags);
+		fprintf(stderr,"From str: %d seq: %d (assoc:0x%x):",sri.sinfo_stream,sri.sinfo_ssn,(u_int) sri.sinfo_assoc_id);
+		fprintf(stderr,"%.*s",rd_sz,recvline);
+	}
+}
+
 int main(int argc,char *argv[])
 {
 	int sockfd;
@@ -47,7 +75,7 @@ int main(int argc,char *argv[])
 	}
 
 	if (echo_to_all == 0){
-
+		sctpstr_cli(stdin,sockfd,(struct sockaddr *) &servaddr,sizeof(servaddr));
 	}else{
 
 	}
