@@ -37,6 +37,7 @@ int main(int argc,char *argv[])
 		perror("bind");
 		return 1;
 	}
+	memset(&events,0,sizeof(events));
 	events.sctp_data_io_event = 1;
 	if (setsockopt(sockfd,IPPROTO_SCTP,SCTP_EVENTS,&events,sizeof(events)) == -1){
 		perror("setsockopt");
@@ -44,7 +45,6 @@ int main(int argc,char *argv[])
 	}
 
 	listenq = getenv("LISTENQ");
-
 	if (listen(sockfd,listenq!=NULL?atoi(listenq):1) == -1){
 		perror("listen");
 		return 1;

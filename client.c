@@ -77,7 +77,6 @@ int main(int argc,char *argv[])
 	if (echo_to_all == 0){
 		sctpstr_cli(stdin,sockfd,(struct sockaddr *) &servaddr,sizeof(servaddr));
 	}else{
-
 	}
 
 	if (close(sockfd) == -1){
